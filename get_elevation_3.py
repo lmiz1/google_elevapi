@@ -16,11 +16,11 @@ from matplotlib import cm
 #y = sys.argv[4]
 #resolution = sys.arg[5]
 
-cent_coor_1 = 51.933333
-cent_coor_2 = 15.5
-x_km = 200.0
-y_km = 300.0
-resolution = 200
+cent_coor_1 = 35.937496
+cent_coor_2 = 14.375416
+x_km = 100.0
+y_km = 100.0
+resolution = 512
 
 key = 'AIzaSyABFgIWxLyVBuH5T4twN2yKdgtJtS67BEM'
 x = x_km/110.574
@@ -36,15 +36,18 @@ ELEVATION_BASE_URL = 'https://maps.googleapis.com/maps/api/elevation/json'
 array = np.zeros([resolution, resolution])
 
 for loop in range (resolution):
-	next_x = first_x+(x/resolution*(loop))
-	url = ELEVATION_BASE_URL + '?path=' + str(next_x) + ',' + str(first_y) + '|' + str(next_x) + ',' + str(last_y) + '&samples=' + str(resolution) + '&key=' + key #'
+	next_x = first_x+(x/resolution*(resolution-1-loop))
+	url = ELEVATION_BASE_URL + '?path=' + str(next_x) + ',' + str(last_y) + '|' + str(next_x) + ',' + str(first_y) + '&samples=' + str(resolution) + '&key=' + key #'
 	response = urllib.urlopen(url)
 	data = json.loads(response.read())
 	#print data
 	
 	count = 0
 	for value in data['results']:
-		array[count, loop] = value['elevation']
+		if (value['elevation'] > 0):
+			array[loop, count] = value['elevation']
+		else:
+			array[loop, count] = 0
 		count = count + 1
 		
 	if (loop == resolution-1):
@@ -77,6 +80,9 @@ file.close
 
 plt.imshow(array)
 plt.show()
+
+
+
 #ax = plt.figure().gca(projection = '3d')
 #ax.plot_surface(x_list, y_list, z_list, rstride = 8, cstride = 8, alpha = 0.3)
 #plt.show()
